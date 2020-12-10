@@ -1,0 +1,29 @@
+version: '2'
+
+services:
+  etcd:
+    image: 'bitnami/etcd:latest'
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+    ports:
+      - 2379:2379
+      - 2380:2380
+    networks:
+      - app-tier
+
+  watcher_client:
+    image: 'watcher-client:develop'
+    command: /usr/local/bin/watcher_client -etcdHost etcd:2379 -etcdWatchKey test
+    networks:
+      - app-tier
+
+  put_client:
+    image: 'put-client:develop'
+    command: /usr/local/bin/put_client -etcdHost etcd:2379 -etcdWatchKey test
+    networks:
+      - app-tier
+
+networks:
+  app-tier:
+    driver: bridge
